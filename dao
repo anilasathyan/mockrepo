@@ -1,0 +1,513 @@
+MOCK DAO
+
+package com.spring.mock.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+
+public class mockdao {
+	NamedParameterJdbcTemplate jdbc;
+	@Autowired
+	public void setdatasource(DataSource jdbc)
+	{
+		this.jdbc=new NamedParameterJdbcTemplate(jdbc);
+	}
+	public void userRegistration(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into student(fname,lname,email,phone,pass,photo)values(:fname,:lname,:mail,:phone,:psw,:file)", params);
+	}
+	public List<MockModel> viewlastId(MockModel mm) {
+		// TODO Auto-generated method stub
+		return jdbc.query("SELECT * FROM `student` ORDER by uid desc limit 1", new RowMapper<MockModel>() {
+
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m=new MockModel();
+				m.setUid(rs.getString("uid"));
+				return m;
+			}
+		});
+	}
+	public void addOtp(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into otp(uid,otp)values(:uid,:rand)",params);
+		
+	}
+	
+	public List<MockModel> checkotp(MockModel mm) {
+		// TODO Auto-generated method stub
+		return jdbc.query("SELECT * FROM `otp` ORDER BY uid DESC LIMIT 1", new RowMapper<MockModel>() {
+
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m1=new MockModel();
+				m1.setOtp(rs.getString("otp"));
+				return m1;
+			}
+
+			});
+
+}
+	public List<MockModel> checkAdmin(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("SELECT * FROM `adminlogin` where uname=:mail and pword=:psw ", params,new RowMapper<MockModel>() {
+
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m2=new MockModel();
+				return m2;
+			}
+		
+	});
+	}
+	public List<MockModel> checkUser(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("SELECT * FROM `student` where email=:mail and pass=:psw ", params,new RowMapper<MockModel>() {
+
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m3=new MockModel();
+				m3.setUid(rs.getString("uid"));
+				m3.setFile(rs.getString("photo"));
+				return m3;
+	}
+});
+	}
+	public void checkfeed(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into feedback(uid,feedback)values(:uid,:feed)",params);
+		
+	}
+	public List<MockModel> viewfeed(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select fname,photo,feedback from`student`,`feedback` where student.uid=feedback.uid", params,new RowMapper<MockModel>() {
+
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m4=new MockModel();
+				//m4.setUid(rs.getString("uid"));
+				m4.setFname(rs.getString("fname"));
+				m4.setFeed(rs.getString("feedback"));
+				m4.setFile(rs.getString("photo"));
+				System.out.println(rs.getString("photo"));
+				return m4;
+	}
+});
+	
+	}
+	public List<MockModel> checkmail(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from`student` where email=:mail", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m5=new MockModel();
+				
+				m5.setPsw(rs.getString("pass"));
+		return m5;
+	}
+});
+	}
+	public void changepassword(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+	 jdbc.update("update student set pass=:psw where uid=:uid", params);
+	}
+	public void addq(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into addquestion(category,ques,opt1,opt2,opt3,opt4,ans)values(:cat,:question,:o1,:o2,:o3,:o4,:an)", params);
+	}
+	public void addc(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into category(category)values(:cat)", params);
+	}
+	public List<MockModel> checkcat(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from`category` ", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m6=new MockModel();
+				m6.setCat(rs.getString("category"));
+				
+		return m6;
+	}
+});
+	}
+	public void addinstruction(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into instruction(inst)values(:ins)", params);
+		
+	}
+
+	public List<MockModel> checkins(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from`instruction` ", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m7=new MockModel();
+				m7.setIns(rs.getString("inst"));
+				
+		return m7;
+	}
+	});
+	}
+	public List<MockModel> checkq(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where category='aptitude' and qid not in(select qid from mark where date=:date)", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+				m8.setO1(rs.getString("opt1"));
+				m8.setO2(rs.getString("opt2"));
+				m8.setO3(rs.getString("opt3"));
+				m8.setO4(rs.getString("opt4"));
+				m8.setId(rs.getString("qid"));
+		return m8;
+	}
+	});
+	}
+	
+	public void addt(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into type(type)values(:t1)", params);
+	}
+	public List<MockModel> checksyllabus(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from`type` ", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m9=new MockModel();
+				m9.setType(rs.getString("type"));
+				
+		return m9;
+			}
+			});
+}
+	public void addsyl(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into syllabus(type,topic,weight)values(:type,:tp,:wgt)", params);	
+	}
+	public List<MockModel> checkans(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select ans from`addquestion` where qid=:qid", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m10=new MockModel();
+				m10.setAn(rs.getString("ans"));
+				
+		return m10;
+			}
+			});
+	}
+	public List<MockModel> checkoption(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select opt1,opt2,opt3,opt4 from`addquestion` where qid=:qid", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m11=new MockModel();
+				m11.setR1(rs.getString("opt1"));
+				m11.setR1(rs.getString("opt2"));
+				m11.setR1(rs.getString("opt3"));
+				m11.setR1(rs.getString("opt4"));
+				
+		return m11;
+			}
+	});
+	
+}
+	public void addmark(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into mark(uid,count,category,mark)values(:uid,:count,:cat,:mark)", params);	
+	}
+	public List<MockModel> checkq1(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where qid=:id ", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+				m8.setO1(rs.getString("opt1"));
+				m8.setO2(rs.getString("opt2"));
+				m8.setO3(rs.getString("opt3"));
+				m8.setO4(rs.getString("opt4"));
+				m8.setId(rs.getString("qid"));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> viewAnswer(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where qid=:id ", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+			m8.setAn(rs.getString("ans"));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> nextcheckq(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where category='aptitude' and qid not in(select qid from mark where category='aptitude' and date=:date) order by qid desc limit 1", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+				m8.setO1(rs.getString("opt1"));
+				m8.setO2(rs.getString("opt2"));
+				m8.setO3(rs.getString("opt3"));
+				m8.setO4(rs.getString("opt4"));
+				m8.setId(rs.getString("qid"));
+		return m8;
+	}
+	});
+	}
+	public void submitMark(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into mark(uid,qid,category,mark,date)values(:uid,:id,'aptitude',:mark,:date)", params);	
+	}
+	public List<MockModel> checkquestion(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where category='core part' and qid not in(select qid from mark where date=:date and uid=:uid)", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+				m8.setO1(rs.getString("opt1"));
+				m8.setO2(rs.getString("opt2"));
+				m8.setO3(rs.getString("opt3"));
+				m8.setO4(rs.getString("opt4"));
+				m8.setId(rs.getString("qid"));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> checkque1(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where qid>=:lid and category='core part' and qid not in(select qid from mark where date=:date and uid=:uid) limit 10", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+				m8.setO1(rs.getString("opt1"));
+				m8.setO2(rs.getString("opt2"));
+				m8.setO3(rs.getString("opt3"));
+				m8.setO4(rs.getString("opt4"));
+				m8.setId(rs.getString("qid"));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> checkque11(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where category='core part' and qid not in(select qid from mark where date=:date and uid=:uid) order by qid desc  limit 1", params,new RowMapper<MockModel>() {
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+				m8.setO1(rs.getString("opt1"));
+				m8.setO2(rs.getString("opt2"));
+				m8.setO3(rs.getString("opt3"));
+				m8.setO4(rs.getString("opt4"));
+				m8.setId(rs.getString("qid"));
+		return m8;
+	}
+	});
+	}
+	
+	public void submitMark1(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		jdbc.update("insert into mark(uid,qid,category,mark,date)values(:uid,:id,'core part',:mark,:date)", params);	
+	}
+	public List<MockModel> nextcheckques(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `addquestion` where category='core part' and qid not in(select qid from mark where category='core part' and date=:date) order by qid desc limit 1", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+				m8.setQuestion(rs.getString("ques"));
+				m8.setO1(rs.getString("opt1"));
+				m8.setO2(rs.getString("opt2"));
+				m8.setO3(rs.getString("opt3"));
+				m8.setO4(rs.getString("opt4"));
+				m8.setId(rs.getString("qid"));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> aptitudemark(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select sum(mark) from `mark` where category='aptitude' and date=:date and uid=:uid", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		m8.setCount(rs.getString(1));
+		return m8;
+	}
+	});
+	}
+	
+	public List<MockModel> coremark(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select sum(mark) from `mark` where category='core part' and date=:date and uid=:uid", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		m8.setCount(rs.getString(1));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> checkExam(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select sum(mark) from `mark` where category='core part' and date=:date and uid=:uid", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		m8.setCount(rs.getString(1));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> checkExam1(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select * from `mark` where date=:date and uid=:uid", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		//m8.setCount(rs.getString(1));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> checkTreshold(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select sum(mark) from `mark` where category='aptitude' and date=:date and uid=:uid", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		m8.setMark(rs.getString(1));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> viewDate(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select distinct date from `mark` where uid=:uid", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		m8.setDate(rs.getString("date"));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> aptitudeCount(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select count(*) from addquestion where category='aptitude'", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		m8.setCount1(rs.getInt(1));
+		return m8;
+	}
+	});
+	}
+	public List<MockModel> coreCount(MockModel mm) {
+		// TODO Auto-generated method stub
+		BeanPropertySqlParameterSource params=new BeanPropertySqlParameterSource(mm);
+		return jdbc.query("select count(*) from addquestion where category='core part'", params,new RowMapper<MockModel>() {
+			
+			@Override
+			public MockModel mapRow(ResultSet rs, int arg1) throws SQLException {
+				// TODO Auto-generated method stub
+				MockModel m8=new MockModel();
+		m8.setCount1(rs.getInt(1));
+		return m8;
+	}
+	});
+	}
+		}
+
