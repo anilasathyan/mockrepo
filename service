@@ -1,0 +1,187 @@
+MOCK SERVICE
+
+package com.spring.mock.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.spring.mock.dao.MockModel;
+import com.spring.mock.dao.mockdao;
+
+@Service
+public class mockservice {
+	mockdao md;
+	@Autowired
+	public void setdao(mockdao md)
+	{
+		this.md=md;
+	}
+	public void userRegistration(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.userRegistration(mm);
+	}
+	public List<MockModel> viewlastId(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.viewlastId(mm);
+	}
+	public void addOtp(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.addOtp(mm);
+		
+	}
+	
+	public List<MockModel> checkotp(MockModel mm) {
+		// TODO Auto-generated method stub
+		return  md.checkotp(mm);
+	}
+	public List<MockModel> checkAdmin(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkAdmin(mm);
+	}
+	public List<MockModel> checkUser(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkUser(mm);
+	}
+	public void checkfeed(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.checkfeed(mm);
+	}
+	
+	
+	
+	
+	public List<MockModel> viewfeed(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.viewfeed(mm);
+	}
+	public List<MockModel> checkmail(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkmail(mm);
+	
+	}
+	public void changepassword(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.changepassword(mm);
+		
+	}
+	public void addq(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.addq(mm);
+	}
+	public void addc(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.addc(mm);
+	}
+	public List<MockModel> checkcat(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkcat(mm);
+	}
+	public void addinstruction(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.addinstruction(mm);
+	}
+	public List<MockModel> checkins(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkins(mm);
+	}
+	public List<MockModel> checkq(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkq(mm);
+	}
+	
+	public void addt(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.addt(mm);
+	}
+	public List<MockModel> checksyllabus(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checksyllabus(mm);
+	}
+	public void syl(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.addsyl(mm);
+	}
+	public List<MockModel> checkans(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkans(mm);
+	}
+	public List<MockModel> checkoption(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkoption(mm);
+	}
+	public void addmark(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.addmark(mm);
+	}
+	public List<MockModel> checkq1(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkq1(mm);
+	}
+	public List<MockModel> viewAnswer(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.viewAnswer(mm);
+	}
+	public List<MockModel> nextcheckq(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.nextcheckq(mm);
+	}
+	public void submitMark(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.submitMark(mm);
+	}
+	public List<MockModel> checkquestion(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkquestion(mm);
+	}
+	public List<MockModel> checkque1(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkque1(mm);
+	}
+	public void submitMark1(MockModel mm) {
+		// TODO Auto-generated method stub
+		md.submitMark1(mm);
+	}
+	public List<MockModel> nextcheckques(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.nextcheckques(mm);
+	}
+	public List<MockModel> aptitudemark(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.aptitudemark(mm);
+	}
+	public List<MockModel> coreemark(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.coremark(mm);
+	}
+	public List<MockModel> checkExam(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkExam(mm);
+	}
+	public List<MockModel> checkExam1(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkExam1(mm);
+	}
+	public List<MockModel> checkTreshold(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkTreshold(mm);
+	}
+	public List<MockModel> viewDate(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.viewDate(mm);
+	}
+	public List<MockModel> checkque11(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.checkque11(mm);
+	}
+	public List<MockModel> aptitudeCount(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.aptitudeCount(mm);
+	}
+	public List<MockModel> coreCount(MockModel mm) {
+		// TODO Auto-generated method stub
+		return md.coreCount(mm);
+	}
+	
+	}
