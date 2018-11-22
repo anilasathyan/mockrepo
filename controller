@@ -1,0 +1,932 @@
+MOCK CONTROLLER
+
+package com.spring.mock.controller;
+
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.swing.JOptionPane;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.spring.mock.dao.MockModel;
+import com.spring.mock.service.mockservice;
+
+@Controller
+
+public class mockcontroller {
+mockservice ms;
+@Autowired
+public void setms(mockservice ms)
+{
+	this.ms=ms;
+}
+	@RequestMapping("/")
+	public String login(MockModel mm)
+	{
+		return "home";
+	}
+	@RequestMapping("/login")
+	public String loadlogin()
+	{
+		return "login";
+	}
+	
+	@RequestMapping("/reg")
+	public String loadreg()
+	{
+		return "registration";
+	}
+	@RequestMapping("/ufeed")
+	public String loaduserfeed(MockModel mm,HttpSession ses,Model m)
+	{
+		m.addAttribute("vf", ms.viewfeed(mm));
+	
+		
+		return "userviewfeed";
+	}
+	
+	/*@RequestMapping("/")
+	public String load()
+	{
+		return "adminhome";
+	}*/
+	@RequestMapping("/ureg")
+	public String userRegistration(MockModel mm,HttpServletRequest request)
+	{
+		ArrayList<String> data=uploadFile.uploadImage(request);
+		mm.setFname(data.get(0));
+		mm.setLname(data.get(1));
+		mm.setMail(data.get(2));
+		mm.setPhone(data.get(3));
+		mm.setFile(data.get(4));
+		mm.setPsw(data.get(5));
+		
+		ms.userRegistration(mm);
+		Random rand=new Random();
+		String rand1=String.format("%04d", rand.nextInt(10000));
+		mm.setRand(rand1);
+		System.out.println(mm.getMail());
+		String recipient=mm.getMail();
+		String subject="OTP";
+		String content="otp number"   +rand1+"";
+		try {
+			uploadmail.sendEmail(recipient, subject,content);
+			List<MockModel>olist=ms.viewlastId(mm);
+			MockModel mok=olist.get(0);
+mm.setUid(mok.getUid());
+ms.addOtp(mm);
+
+Date date=new Date();
+DateFormat da=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//String dd=da.format(date);
+System.out.println(da.format(date));
+ Calendar c = Calendar.getInstance();
+ c.setTime(date);
+ c.add(Calendar.YEAR, 0);
+ c.add(Calendar.DATE, 0); //same with c.add(Calendar.DAY_OF_MONTH, 1);
+c.add(Calendar.HOUR, 0);
+c.add(Calendar.MINUTE, 3);
+ c.add(Calendar.SECOND, 0);
+ DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	Date date1 = new Date();
+	//System.out.println(dateFormat.format(date1));
+	mm.setTime1(dateFormat.format(date1));
+ Date currentDatePlusOne = c.getTime();
+ String dd=da.format(currentDatePlusOne);
+ mm.setTime(dd);
+ System.out.println(mm.getTime()+""+mm.getTime1());
+ if(mm.getTime()==mm.getTime1())
+ {
+	 return "registration";
+ }
+ else
+ {
+ return "otp";
+ }
+ 
+			//ssJOptionPane.showMessageDialog(null, "Send Message Successfully", "InfoBox: " + "message", JOptionPane.INFORMATION_MESSAGE);
+		} catch (Exception e1) {
+			
+			e1.printStackTrace();
+		}   
+
+
+
+		return "otp";
+	}
+
+	@RequestMapping("/uotp")
+	public String loadotp(MockModel mm)
+	{
+		List<MockModel>otlist=ms.checkotp(mm);
+		MockModel mo=otlist.get(0);
+		String otp=mo.getOtp();
+		if(otp.equals(mm.getOtp()))
+		{
+			
+		return "login";
+		}
+		else 
+		{
+			JOptionPane.showMessageDialog(null, "incorrect otp");
+			return "otp";
+		}
+		
+	}
+
+	@RequestMapping("/clogin")
+	public String loadclogin(MockModel mm,HttpSession ses,Model mod)
+	{
+		List<MockModel>alist=ms.checkAdmin(mm);
+		List<MockModel>ulist=ms.checkUser(mm);
+		
+		//System.out.println(alist.size()>0);
+		if(alist.size()>0)
+		{
+			return "adminhome";
+		}
+		else if(ulist.size()>0)
+		{
+			MockModel m=ulist.get(0);
+			ses.setAttribute("uid", m.getUid());
+			
+			//ses.setAttribute("photo",m.getFile());
+			//String img=m.getFile();
+			mod.addAttribute("img", m.getFile());
+			return "userhome";
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null, "incorrect username or password");
+			return "login";
+		}
+		}
+	@RequestMapping("/addfeedback")
+	public String loadaddfeedback(MockModel mm,HttpSession ses)
+	{
+		
+		return "ufeedback";
+	
+		
+		
+	}
+	@RequestMapping("/viewfeedback")
+	public String loadfeed(MockModel mm,HttpSession ses,Model m)
+	{
+	m.addAttribute("vf", ms.viewfeed(mm));
+		return "viewfeedback";
+	
+		
+		
+	}
+	@RequestMapping("/viewadq")
+	public String viewAddquestion(MockModel mm,Model m)
+	{
+		List<MockModel>zlist=ms.checkcat(mm);
+		m.addAttribute("vc", zlist);
+	//	m.addAttribute("vf", ms.viewallQuestion(mm));
+		return "viewadques"; 
+	}
+	@RequestMapping("/afeedback")
+	public String addFeedback(MockModel mm,HttpSession ses)
+	{
+		String uid=(String) ses.getAttribute("uid");
+		mm.setUid(uid);
+		ms.checkfeed(mm);
+		return "ufeedback";
+	}
+	@RequestMapping("/widgets.html")
+	public String viewFeeddback(MockModel mm)
+	{
+		return "viewfeedback";
+	}
+	
+	@RequestMapping("/chome")
+	public String loadchome()
+	{
+		return "home";
+	}
+	@RequestMapping("/forgot")
+	public String loadforgot(MockModel mm)
+	{
+		return "forgotpsw";
+	}
+	@RequestMapping("/fpass")
+	public String loadfpass(MockModel mm)
+	{
+
+		mm.setMail(mm.getMail());
+		List<MockModel>elist=ms.checkmail(mm);
+		if(elist.size()>0)
+		{
+			MockModel m=elist.get(0);
+			System.out.println(m.getPsw());
+			String recipient=mm.getMail();
+			String subject="password";
+			String content="password"   +m.getPsw()+"";
+			try {
+				uploadmail.sendEmail(recipient, subject,content);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			return "login";
+			
+		}
+		else
+		{
+			return "forgotpsw";
+		}
+		
+	}
+	@RequestMapping("/sprofile")
+		public String loadsprofile(MockModel mm,HttpSession ses,HttpServletResponse response)
+		{
+		String uid=(String) ses.getAttribute("uid");
+		mm.setUid(uid);
+		response.setHeader("Cache-Control","no-cache"); //Forces caches to obtain a new copy of the page from the origin server
+		response.setHeader("Cache-Control","no-store"); //Directs caches not to store the page under any circumstance
+		response.setDateHeader("Expires", 0); //Causes the proxy cache to see the page as "stale"
+		response.setHeader("Pragma","no-cache"); //HTTP 1.0 backward compatibility
+		
+				if(uid==null)
+		{
+			return "login";
+		}
+		else
+		{
+		return"changepsw";
+		}
+		
+	}
+	@RequestMapping("/changepsw")
+	public String loadchangepsw(MockModel mm,HttpSession ses,HttpServletResponse response)
+	{
+		String uid=(String) ses.getAttribute("uid");
+		mm.setUid(uid);
+		response.setHeader("Cache-Control","no-cache"); //Forces caches to obtain a new copy of the page from the origin server
+		response.setHeader("Cache-Control","no-store"); //Directs caches not to store the page under any circumstance
+		response.setDateHeader("Expires", 0); //Causes the proxy cache to see the page as "stale"
+		response.setHeader("Pragma","no-cache"); //HTTP 1.0 backward compatibility
+		
+				if(uid==null)
+		{
+			return "login";
+		}
+		else
+		{
+			
+			//mm.setUid(uid);
+		ms.changepassword(mm);
+		return "login";
+		}
+	}
+	@RequestMapping("/logout")
+	public String logout(HttpSession ses)
+	{
+		if(ses!=null)
+		{
+			ses.invalidate();
+			
+			return "login";
+		}
+		else
+		{
+		return "home";
+		}
+	}
+	
+	@RequestMapping("/add")
+	public String loadadd(MockModel mm,Model m)
+	{
+		List<MockModel>zlist=ms.checkcat(mm);
+		m.addAttribute("vc", zlist);
+		return "addque";
+	}
+	@RequestMapping("/addq")
+	public String loadaddq(MockModel mm,Model m)
+	{
+		if(mm.getCat().equals("aptitude"))
+		{
+			List<MockModel> list=ms.aptitudeCount(mm);
+			MockModel l=list.get(0);
+			if(l.getCount1()==10)
+			{
+				JOptionPane.showMessageDialog(null, "alredy 10 question added");
+			}
+			else
+			{
+				ms.addq(mm);
+			}
+		}
+		else
+		{
+			List<MockModel> list1=ms.coreCount(mm);
+			MockModel l1=list1.get(0);
+			if(l1.getCount1()==25)
+			{
+				JOptionPane.showMessageDialog(null, "alredy 25 question added");
+			}
+			else
+			{
+				ms.addq(mm);
+			}
+		}
+		
+		
+		List<MockModel>zlist=ms.checkcat(mm);
+		m.addAttribute("vc", zlist);
+		
+		
+		return "addque";
+	}
+	@RequestMapping("/addcat")
+	public String loadaddcat(MockModel mm)
+	{
+		return "addcategory";
+	}
+	@RequestMapping("/addc")
+	public String loadaddc(MockModel mm,Model m)
+	{
+		
+		ms.addc(mm);
+
+		return "addcategory";
+	}
+	@RequestMapping("/instruction")
+	public String loadins(MockModel mm)
+	{
+		
+		
+
+		return "addinst";
+	}
+	@RequestMapping("/addinstruction")
+	public String loadinstruction(MockModel mm)
+	{
+		ms.addinstruction(mm);
+		
+
+		return "addinst";
+	}
+	@RequestMapping("/start")
+	public String loadstart(MockModel mm,Model m)
+	{
+		
+		
+		List<MockModel>inlist=ms.checkins(mm);
+		m.addAttribute("vi", inlist);
+		
+		return "viewinstruction";
+	}
+	@RequestMapping("/viewq")
+	public String loadviewq(MockModel mm,Model m,HttpSession ses)
+	{
+		
+		
+		
+		
+		/*List<MockModel>anslist=ms.checkans(mm);
+		List<MockModel>oplist=ms.checkoption(mm);
+		int mr=0;
+		if(anslist==oplist)
+		{
+			ms.addmark(mm);
+			List
+		 mr=mr+1;
+		}
+		else
+		{
+			 mr=mr+0;
+		}
+	
+*/
+		 String id=(String) ses.getAttribute("uid");
+			mm.setUid(id);
+			Date date=new Date();
+			DateFormat da=new SimpleDateFormat("yyyy-MM-dd");
+			String dd=da.format(date);
+			mm.setDate(dd);
+		List<MockModel> mlist=ms.checkExam1(mm);
+		if(mlist.size()>0)
+		{
+			JOptionPane.showMessageDialog(null, "only one exam in a day");
+			List<MockModel>inlist=ms.checkins(mm);
+			m.addAttribute("vi", inlist);
+			
+			return "viewinstruction";
+		}
+		else
+		{
+		return "selectpaper";
+		}
+	}
+		
+	@RequestMapping("/syllabus")
+	public String loadsyllabus(MockModel mm,Model m)
+	{
+		List<MockModel>slist=ms.checksyllabus(mm);
+		m.addAttribute("vt", slist);
+		return "addsyllabus";
+		
+
+	
+	}
+	@RequestMapping("/syl")
+	public String loadsyl(MockModel mm,Model m)
+	{
+		ms.syl(mm);
+	
+		List<MockModel>slist=ms.checksyllabus(mm);
+		m.addAttribute("vt", slist);
+		return "addsyllabus";
+	}
+	@RequestMapping("/adtype")
+	public String loadadtype(MockModel mm)
+	{
+		
+
+		return "adminaddtype";
+	}
+	@RequestMapping("/addt")
+	public String loadaddt(MockModel mm)
+	{
+	ms.addt(mm);
+	
+
+		return "adminaddtype";
+	}
+	@RequestMapping("/select")
+	public String loadstart(MockModel mm,Model m,HttpSession ses)
+	{
+		Date date=new Date();
+		DateFormat da=new SimpleDateFormat("HH:mm:ss");
+		//String dd=da.format(date);
+		System.out.println(da.format(date));
+		 Calendar c = Calendar.getInstance();
+		 c.setTime(date);
+		 c.add(Calendar.YEAR, 0);
+		 c.add(Calendar.DATE, 0); //same with c.add(Calendar.DAY_OF_MONTH, 1);
+		c.add(Calendar.HOUR, 0);
+		c.add(Calendar.MINUTE, 10);
+		 c.add(Calendar.SECOND, 0);
+		 DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+			Date date1 = new Date();
+			//System.out.println(dateFormat.format(date1));
+			mm.setTime1(dateFormat.format(date1));
+		 Date currentDatePlusOne = c.getTime();
+		 String dd=da.format(currentDatePlusOne);
+		 mm.setTime(dd);
+		 System.out.println(mm.getTime()+""+mm.getTime1());
+		 ses.setAttribute("tim1", mm.getTime());
+		System.out.println(mm.getTime());
+		List<MockModel>viewlist=ms.checkq(mm);
+		MockModel m1=viewlist.get(0);
+		m.addAttribute("q", m1.getQuestion());
+		m.addAttribute("op1", m1.getO1());
+		m.addAttribute("op2", m1.getO2());
+		m.addAttribute("op3", m1.getO3());
+		m.addAttribute("op4", m1.getO4());
+	    m.addAttribute("qd",m1.getQid());
+	    m.addAttribute("id", m1.getId());
+	    String id=(String) ses.getAttribute("uid");
+		mm.setUid(id);
+m.addAttribute("vq", ms.checkq(mm));
+		return "viewque";
+	}@RequestMapping(value="/answer", params="id")
+	public String answerQuestion(MockModel mm,Model m,HttpSession ses)
+	{
+		Date cur = null,end = null;
+		DateFormat df=new SimpleDateFormat("HH:mm:ss");
+		
+			 String time1=(String) ses.getAttribute("tim1");
+			System.out.println(time1);
+			try {
+				 end=df.parse(time1);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Date date1=new Date();
+			DateFormat da1=new SimpleDateFormat("HH:mm:ss");
+			String dd1=da1.format(date1);
+			mm.setDat(dd1);
+			String ct=mm.getDat();
+			try {
+				 cur=df.parse(ct);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(cur.after(end))
+			{
+				return "selectpaper2";
+			}
+		 String id=(String) ses.getAttribute("uid");
+			mm.setUid(id);
+			Date date=new Date();
+			DateFormat da=new SimpleDateFormat("yyyy-MM-dd");
+			String dd=da.format(date);
+			mm.setDate(dd);
+	m.addAttribute("vq", ms.checkq(mm));
+	List<MockModel> alist=ms.viewAnswer(mm);
+	MockModel a=alist.get(0);
+	if(a.getAn().equals(mm.getR1()))
+	{
+		
+		String mark="1";
+		mm.setMark(mark);	
+		ms.submitMark(mm);
+		List<MockModel>viewlist=ms.nextcheckq(mm);
+		if(viewlist.size()>0)
+		{
+		MockModel m1=viewlist.get(0);
+		m.addAttribute("q", m1.getQuestion());
+		m.addAttribute("op1", m1.getO1());
+		m.addAttribute("op2", m1.getO2());
+		m.addAttribute("op3", m1.getO3());
+		m.addAttribute("op4", m1.getO4());
+	    m.addAttribute("qd",m1.getQid());
+	    m.addAttribute("id", m1.getId());
+		System.out.println("its working");
+		m.addAttribute("vq", ms.checkq(mm));
+		}
+		else
+		{
+			List<MockModel> tlist= ms.checkTreshold(mm);
+			MockModel t=tlist.get(0);
+	String mr=t.getMark();
+	int mr1=Integer.parseInt(mr);
+	if(mr1>3)
+	{
+		return "selectpaper2";
+	
+	}
+	else
+	{
+		JOptionPane.showMessageDialog(null, "your cut off is less so you are disqualified");
+		List<MockModel>inlist=ms.checkins(mm);
+		m.addAttribute("vi", inlist);
+		
+		return "viewinstruction";	
+	}
+		}
+		
+	}
+	else
+	{
+		
+		String mark="0";
+		mm.setMark(mark);		
+		ms.submitMark(mm);
+		List<MockModel>viewlist=ms.nextcheckq(mm);
+		if(viewlist.size()>0)
+		{
+		MockModel m1=viewlist.get(0);
+		m.addAttribute("q", m1.getQuestion());
+		m.addAttribute("op1", m1.getO1());
+		m.addAttribute("op2", m1.getO2());
+		m.addAttribute("op3", m1.getO3());
+		m.addAttribute("op4", m1.getO4());
+	    m.addAttribute("qd",m1.getQid());
+	    m.addAttribute("id", m1.getId());
+		System.out.println("its working");
+		
+		}
+		else
+		{
+			List<MockModel> tlist= ms.checkTreshold(mm);
+			MockModel t=tlist.get(0);
+	String mr=t.getMark();
+	int mr1=Integer.parseInt(mr);
+			if(mr1>3)
+			{
+				return "selectpaper2";
+			
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "your cut off is less so you are disqualified");
+				List<MockModel>inlist=ms.checkins(mm);
+				m.addAttribute("vi", inlist);
+				
+				return "viewinstruction";	
+			}
+		}
+		m.addAttribute("vq", ms.checkq(mm));
+	}
+	/*	*/
+	
+		return "viewque";
+	}
+	
+@RequestMapping(value="/show", params="final")
+public String finalSubmission(MockModel mm,Model m,HttpSession ses)
+{
+	 String id=(String) ses.getAttribute("uid");
+		mm.setUid(id);
+		Date date=new Date();
+		DateFormat da=new SimpleDateFormat("yyyy-MM-dd");
+		String dd=da.format(date);
+		mm.setDate(dd);
+		List<MockModel> tlist= ms.checkTreshold(mm);
+		MockModel t=tlist.get(0);
+String mr=t.getMark();
+int mr1=Integer.parseInt(mr);
+		if(mr1>3)
+		{
+			return "selectpaper2";
+		
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null, "your cut off is less so you are disqualified");
+			List<MockModel>inlist=ms.checkins(mm);
+			m.addAttribute("vi", inlist);
+			
+			return "viewinstruction";	
+		}
+}
+	@RequestMapping(value="/show", params="id")
+	public String showQuestion(MockModel mm,Model m,HttpSession ses)
+	{
+		Date cur = null,end = null;
+		DateFormat df=new SimpleDateFormat("HH:mm:ss");
+		 String id=(String) ses.getAttribute("uid");
+			mm.setUid(id);
+			 String time1=(String) ses.getAttribute("tim1");
+			System.out.println(time1);
+			try {
+				 end=df.parse(time1);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Date date1=new Date();
+			DateFormat da1=new SimpleDateFormat("HH:mm:ss");
+			String dd1=da1.format(date1);
+			mm.setDat(dd1);
+			String ct=mm.getDat();
+			try {
+				 cur=df.parse(ct);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(cur.after(end))
+			{
+				return "selectpaper2";
+			}
+			Date date=new Date();
+			DateFormat da=new SimpleDateFormat("yyyy-MM-dd");
+			String dd=da.format(date);
+			mm.setDate(dd);
+	m.addAttribute("vq", ms.checkq(mm));
+		List<MockModel>viewlist=ms.checkq1(mm);
+		MockModel m1=viewlist.get(0);
+		m.addAttribute("q", m1.getQuestion());
+		m.addAttribute("op1", m1.getO1());
+		m.addAttribute("op2", m1.getO2());
+		m.addAttribute("op3", m1.getO3());
+		m.addAttribute("op4", m1.getO4());
+	    m.addAttribute("qd",m1.getQid());
+	    m.addAttribute("id", m1.getId());
+		return "viewque";
+	}
+	@RequestMapping("/show1")
+	public String showQuestion1(MockModel mm,Model m,HttpSession ses)
+	{
+		Date date=new Date();
+		DateFormat da=new SimpleDateFormat("yyyy-MM-dd");
+		String dd=da.format(date);
+		mm.setDate(dd);
+		Date cur = null,end = null;
+		DateFormat df=new SimpleDateFormat("HH:mm:ss");
+		 String id=(String) ses.getAttribute("uid");
+			mm.setUid(id);
+			 String time1=(String) ses.getAttribute("tim1");
+			System.out.println(time1);
+			try {
+				 end=df.parse(time1);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Date date1=new Date();
+			DateFormat da1=new SimpleDateFormat("HH:mm:ss");
+			String dd1=da1.format(date1);
+			mm.setDat(dd1);
+			String ct=mm.getDat();
+			try {
+				 cur=df.parse(ct);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(cur.after(end))
+			{
+				List<MockModel>aplist=ms.aptitudemark(mm);
+				MockModel ap=aplist.get(0);
+				m.addAttribute("am", ap.getCount());
+				List<MockModel>clist=ms.coreemark(mm);
+				MockModel cm=clist.get(0);
+				m.addAttribute("cm", cm.getCount());
+				return "mark";
+			}
+		
+		List<MockModel>viewlist=ms.checkq1(mm);
+		MockModel m1=viewlist.get(0);
+		m.addAttribute("q", m1.getQuestion());
+		m.addAttribute("op1", m1.getO1());
+		m.addAttribute("op2", m1.getO2());
+		m.addAttribute("op3", m1.getO3());
+		m.addAttribute("op4", m1.getO4());
+	    m.addAttribute("qd",m1.getQid());  
+	    m.addAttribute("id", m1.getId());
+		m.addAttribute("vq", ms.checkque1(mm));
+		return "viewque1";
+	}
+	@RequestMapping("/dash")
+	public String dashboard(Model m,MockModel mm,HttpSession ses)
+	{
+		 String id=(String) ses.getAttribute("uid");
+			mm.setUid(id);
+		m.addAttribute("vd", ms.viewDate(mm));
+		return "dashboard";
+	}
+	@RequestMapping("/analysis")
+	public String analysis(Model m,MockModel mm,HttpSession ses,HttpServletRequest request)
+	{
+		 String id=(String) ses.getAttribute("uid");
+			mm.setUid(id);
+		//m.addAttribute("vd", ms.viewDate(mm));
+			request.setAttribute("dt", mm.getDate());
+			request.setAttribute("uid", mm.getUid());
+		return "analysis";
+	}
+@RequestMapping("/select2")
+public String select2(MockModel mm,Model m,HttpSession ses)
+{
+	Date date=new Date();
+	DateFormat da=new SimpleDateFormat("HH:mm:ss");
+	//String dd=da.format(date);
+	System.out.println(da.format(date));
+	 Calendar c = Calendar.getInstance();
+	 c.setTime(date);
+	 c.add(Calendar.YEAR, 0);
+	 c.add(Calendar.DATE, 0); //same with c.add(Calendar.DAY_OF_MONTH, 1);
+	c.add(Calendar.HOUR, 0);
+	c.add(Calendar.MINUTE, 10);
+	 c.add(Calendar.SECOND, 0);
+	 DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+		Date date1 = new Date();
+		//System.out.println(dateFormat.format(date1));
+		mm.setTime1(dateFormat.format(date1));
+	 Date currentDatePlusOne = c.getTime();
+	 String dd=da.format(currentDatePlusOne);
+	 mm.setTime(dd);
+	 System.out.println(mm.getTime()+""+mm.getTime1());
+	 ses.setAttribute("tim1", mm.getTime());
+	System.out.println(mm.getTime());
+	List<MockModel>viewlist=ms.checkquestion(mm);
+	MockModel m1=viewlist.get(0);
+	m.addAttribute("q", m1.getQuestion());
+	m.addAttribute("op1", m1.getO1());
+	m.addAttribute("op2", m1.getO2());
+	m.addAttribute("op3", m1.getO3());
+	m.addAttribute("op4", m1.getO4());
+    m.addAttribute("qd",m1.getQid());
+    m.addAttribute("id", m1.getId());
+    String id=(String) ses.getAttribute("uid");
+	mm.setUid(id);
+m.addAttribute("vq", ms.checkque1(mm));
+	return "viewque1";
+	//return "selectpaper2";
+}
+@RequestMapping(value="/answer1", params="id")
+public String answerQuestion1(MockModel mm,Model m,HttpSession ses)
+{
+	 String id=(String) ses.getAttribute("uid");
+		mm.setUid(id);
+		Date date=new Date();
+		DateFormat da=new SimpleDateFormat("yyyy-MM-dd");
+		String dd=da.format(date);
+		mm.setDate(dd);
+		Date cur = null,end = null;
+		DateFormat df=new SimpleDateFormat("HH:mm:ss");
+		
+			 String time1=(String) ses.getAttribute("tim1");
+			System.out.println(time1);
+			try {
+				 end=df.parse(time1);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Date date1=new Date();
+			DateFormat da1=new SimpleDateFormat("HH:mm:ss");
+			String dd1=da1.format(date1);
+			mm.setDat(dd1);
+			String ct=mm.getDat();
+			try {
+				 cur=df.parse(ct);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(cur.after(end))
+			{
+				List<MockModel>aplist=ms.aptitudemark(mm);
+				MockModel ap=aplist.get(0);
+				m.addAttribute("am", ap.getCount());
+				List<MockModel>clist=ms.coreemark(mm);
+				MockModel cm=clist.get(0);
+				m.addAttribute("cm", cm.getCount());
+				return "mark";
+			}
+		
+		List<MockModel> alist=ms.viewAnswer(mm);
+		MockModel a=alist.get(0);
+		if(mm.getR1().equals(a.getAn()))
+		{
+	String mark="1";
+	mm.setMark(mark);		
+	ms.submitMark1(mm);
+	List<MockModel>viewlist=ms.nextcheckques(mm);
+	if(viewlist.size()>0)
+	{
+	MockModel m1=viewlist.get(0);
+	m.addAttribute("q", m1.getQuestion());
+	m.addAttribute("op1", m1.getO1());
+	m.addAttribute("op2", m1.getO2());
+	m.addAttribute("op3", m1.getO3());
+	m.addAttribute("op4", m1.getO4());
+    m.addAttribute("qd",m1.getQid());
+    
+    m.addAttribute("id", m1.getId());
+	System.out.println("its working");
+	m.addAttribute("vq", ms.checkque1(mm));
+	}
+	else
+	{
+		List<MockModel>aplist=ms.aptitudemark(mm);
+		MockModel ap=aplist.get(0);
+		m.addAttribute("am", ap.getCount());
+		List<MockModel>clist=ms.coreemark(mm);
+		MockModel cm=clist.get(0);
+		m.addAttribute("cm", cm.getCount());
+		return "mark";
+	}
+	m.addAttribute("vq", ms.checkque1(mm));
+		}
+		else
+		{
+			String mark="0";
+			mm.setMark(mark);		
+			ms.submitMark1(mm);
+			List<MockModel>viewlist=ms.nextcheckques(mm);
+			if(viewlist.size()>0)
+			{
+			MockModel m1=viewlist.get(0);
+			m.addAttribute("q", m1.getQuestion());
+			m.addAttribute("op1", m1.getO1());
+			m.addAttribute("op2", m1.getO2());
+			m.addAttribute("op3", m1.getO3());
+			m.addAttribute("op4", m1.getO4());
+		    m.addAttribute("qd",m1.getQid());
+		    m.addAttribute("id", m1.getId());
+			System.out.println("its working");
+			m.addAttribute("vq", ms.checkque1(mm));
+			}
+			else
+			{List<MockModel>aplist=ms.aptitudemark(mm);
+			MockModel ap=aplist.get(0);
+			m.addAttribute("am", ap.getCount());
+			List<MockModel>clist=ms.coreemark(mm);
+			MockModel cm=clist.get(0);
+			m.addAttribute("cm", cm.getCount());
+				return "mark";
+			}
+			m.addAttribute("vq", ms.checkque1(mm));
+		}
+	return "viewque1";
+}
+
+}
+	
+
