@@ -1,0 +1,28 @@
+Login 
+@RequestMapping("/clogin")
+	public String loadclogin(MockModel mm,HttpSession ses,Model mod)
+	{
+		List<MockModel>alist=ms.checkAdmin(mm);
+		List<MockModel>ulist=ms.checkUser(mm);
+		
+		//System.out.println(alist.size()>0);
+		if(alist.size()>0)
+		{
+			return "adminhome";
+		}
+		else if(ulist.size()>0)
+		{
+			MockModel m=ulist.get(0);
+			ses.setAttribute("uid", m.getUid());
+			
+			//ses.setAttribute("photo",m.getFile());
+			//String img=m.getFile();
+			mod.addAttribute("img", m.getFile());
+			return "userhome";
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null, "incorrect username or password");
+			return "login";
+		}
+		}
